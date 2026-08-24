@@ -1,6 +1,7 @@
 import os
 import json
 import urllib.request
+import time
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 
@@ -55,8 +56,16 @@ request = urllib.request.Request(
     method="POST"
 )
 
-with urllib.request.urlopen(request) as response:
-    result = json.loads(response.read().decode("utf-8"))
+for attempt in range(3):
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        break
+    except urllib.error.HTTPError as e:
+        if e.code in (429, 503) and attempt < 2:
+            time.sleep(15)
+        else:
+            raise
 
 text = result["candidates"][0]["content"]["parts"][0]["text"]
 content = json.loads(text)
