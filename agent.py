@@ -32,7 +32,7 @@ Do not claim personal experience.
 
 url = (
     "https://generativelanguage.googleapis.com/v1beta/"
-    "models/gemini-flash-latest:generateContent"
+    "models/gemini-2.5-flash:generateContent"
     f"?key={GEMINI_API_KEY}"
 )
 
