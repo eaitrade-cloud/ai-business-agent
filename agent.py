@@ -33,7 +33,6 @@ Do not claim personal experience.
 url = (
     "https://generativelanguage.googleapis.com/v1beta/"
     "models/gemini-2.5-flash-lite:generateContent"
-    f"?key={GEMINI_API_KEY}"
 )
 
 payload = {
@@ -52,7 +51,10 @@ payload = {
 request = urllib.request.Request(
     url,
     data=json.dumps(payload).encode("utf-8"),
-    headers={"Content-Type": "application/json"},
+    headers={
+    "Content-Type": "application/json",
+    "x-goog-api-key": GEMINI_API_KEY
+},
     method="POST"
 )
 
