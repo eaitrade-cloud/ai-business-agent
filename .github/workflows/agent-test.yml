@@ -17,7 +17,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Pillow
-        run: pip install pillow
+        run: pip install Pillow
 
       - name: Run AI agent
         env:
