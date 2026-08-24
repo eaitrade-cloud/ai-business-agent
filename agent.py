@@ -3,18 +3,28 @@ import json
 import time
 import urllib.request
 import urllib.error
-import textwrap
 import random
+import textwrap
 
 from PIL import Image, ImageDraw, ImageFont
 
 
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 
+WIDTH = 1000
+HEIGHT = 1500
 
-# ------------------------------------------------
-# ASK GEMINI TO CREATE THE CONTENT
-# ------------------------------------------------
+CONTENT_FILE = "generated_content.json"
+IMAGE_FILE = "pinterest_image.png"
+
+
+# ============================================================
+# GEMINI CONTENT GENERATION
+# ============================================================
 
 prompt = """
 You are the content agent for AI Business Toolkit.
@@ -24,24 +34,44 @@ Create ONE useful Pinterest post for people interested in:
 - AI tools
 - business automation
 - free or low-cost online business tools
+- productivity tools for small businesses
 
-The goal is useful educational content, not spam.
+Choose ONE specific useful idea.
 
-Return valid JSON only with:
+Avoid repeating generic phrases such as:
+"Start your business with free AI tools."
+
+Return valid JSON only in exactly this structure:
+
 {
   "title": "Pinterest title under 90 characters",
   "description": "Useful Pinterest description under 450 characters",
-  "image_headline": "Short powerful headline, maximum 8 words",
-  "topic": "Short topic name, maximum 4 words",
-  "image_subtitle": "One short useful supporting sentence, maximum 12 words"
+  "image_headline": "Strong useful headline, maximum 8 words",
+  "topic": "Short category, maximum 4 words",
+  "image_subtitle": "One useful supporting sentence, maximum 12 words"
 }
 
-Make the headline easy to read on a Pinterest image.
+Requirements:
+
+The content must teach or suggest something useful.
+
+The image headline must:
+- be easy to understand
+- be suitable for Pinterest
+- contain no more than 8 words
+- avoid clickbait
+- vary between generations
+
+The description must explain what the reader will learn.
 
 Do not make income guarantees.
 Do not invent statistics.
-Do not use clickbait.
+Do not use fake urgency.
 Do not claim personal experience.
+Do not promise easy money.
+Do not produce misleading financial claims.
+
+Return JSON only.
 """
 
 
@@ -49,7 +79,6 @@ url = (
     "https://generativelanguage.googleapis.com/v1beta/"
     "models/gemini-3.5-flash:generateContent"
 )
-
 
 payload = {
     "contents": [
@@ -60,10 +89,10 @@ payload = {
         }
     ],
     "generationConfig": {
-        "responseMimeType": "application/json"
+        "responseMimeType": "application/json",
+        "temperature": 0.9
     }
 }
-
 
 request = urllib.request.Request(
     url,
@@ -76,9 +105,19 @@ request = urllib.request.Request(
 )
 
 
+# ============================================================
+# CALL GEMINI WITH RETRIES
+# ============================================================
+
+result = None
+
 for attempt in range(3):
 
     try:
+
+        print(
+            f"Calling Gemini - attempt {attempt + 1}"
+        )
 
         with urllib.request.urlopen(
             request,
@@ -94,22 +133,92 @@ for attempt in range(3):
     except urllib.error.HTTPError as e:
 
         error_body = e.read().decode("utf-8")
+
+        print("Gemini HTTP error:")
         print(error_body)
 
-        if e.code in (429, 503) and attempt < 2:
+        if e.code in (429, 500, 502, 503, 504) and attempt < 2:
 
-            time.sleep(60)
+            print("Waiting before retry...")
+            time.sleep(30)
+
+        else:
+
+            raise
+
+    except urllib.error.URLError as e:
+
+        print("Network error:", e)
+
+        if attempt < 2:
+
+            time.sleep(20)
 
         else:
 
             raise
 
 
-text = result["candidates"][0]["content"]["parts"][0]["text"]
+if result is None:
+    raise RuntimeError("Gemini did not return a result.")
 
-content = json.loads(text)
+
+# ============================================================
+# PARSE GEMINI RESPONSE
+# ============================================================
+
+try:
+
+    text = (
+        result["candidates"][0]
+        ["content"]["parts"][0]["text"]
+    )
+
+    content = json.loads(text)
+
+except (KeyError, IndexError, json.JSONDecodeError) as e:
+
+    print("Unexpected Gemini response:")
+    print(json.dumps(result, indent=2))
+
+    raise RuntimeError(
+        "Could not parse Gemini response."
+    ) from e
 
 
+required_fields = [
+    "title",
+    "description",
+    "image_headline",
+    "topic",
+    "image_subtitle"
+]
+
+for field in required_fields:
+
+    if field not in content:
+        raise RuntimeError(
+            f"Gemini response is missing: {field}"
+        )
+
+
+# ============================================================
+# CLEAN CONTENT
+# ============================================================
+
+for key in required_fields:
+
+    content[key] = str(
+        content[key]
+    ).strip()
+
+
+content["title"] = content["title"][:90]
+
+content["description"] = content["description"][:450]
+
+
+print()
 print("AI BUSINESS TOOLKIT")
 print("----------------------------------")
 print("Title:", content["title"])
@@ -117,14 +226,15 @@ print("Description:", content["description"])
 print("Image headline:", content["image_headline"])
 print("Topic:", content["topic"])
 print("Image subtitle:", content["image_subtitle"])
+print()
 
 
-# ------------------------------------------------
-# SAVE CONTENT
-# ------------------------------------------------
+# ============================================================
+# SAVE JSON
+# ============================================================
 
 with open(
-    "generated_content.json",
+    CONTENT_FILE,
     "w",
     encoding="utf-8"
 ) as f:
@@ -137,51 +247,58 @@ with open(
     )
 
 
-print("Saved generated_content.json")
+print(f"Saved {CONTENT_FILE}")
 
 
-# ------------------------------------------------
-# PINTEREST IMAGE
-# ------------------------------------------------
-
-WIDTH = 1000
-HEIGHT = 1500
-
-
-# ------------------------------------------------
+# ============================================================
 # DESIGN THEMES
-# ------------------------------------------------
+# ============================================================
 
 themes = [
 
     {
-        "background": (244, 247, 252),
-        "dark": (18, 29, 52),
-        "accent": (62, 105, 190),
-        "light": (222, 232, 248),
-        "text": (20, 27, 40)
+        "background": (245, 248, 252),
+        "dark": (20, 31, 51),
+        "accent": (55, 104, 190),
+        "light": (222, 233, 249),
+        "text": (20, 27, 40),
+        "secondary": (75, 83, 96)
     },
 
     {
-        "background": (248, 246, 241),
-        "dark": (31, 38, 44),
-        "accent": (52, 120, 110),
-        "light": (221, 237, 232),
-        "text": (25, 30, 35)
+        "background": (248, 247, 242),
+        "dark": (29, 40, 43),
+        "accent": (48, 121, 105),
+        "light": (220, 238, 231),
+        "text": (24, 31, 34),
+        "secondary": (73, 82, 80)
     },
 
     {
-        "background": (247, 245, 250),
-        "dark": (37, 29, 58),
-        "accent": (108, 78, 170),
-        "light": (232, 224, 245),
-        "text": (30, 25, 40)
+        "background": (248, 246, 251),
+        "dark": (40, 31, 61),
+        "accent": (107, 78, 171),
+        "light": (233, 226, 246),
+        "text": (32, 27, 43),
+        "secondary": (79, 72, 91)
+    },
+
+    {
+        "background": (249, 247, 243),
+        "dark": (35, 36, 40),
+        "accent": (183, 105, 54),
+        "light": (243, 229, 216),
+        "text": (31, 31, 34),
+        "secondary": (82, 77, 72)
     }
 ]
 
-
 theme = random.choice(themes)
 
+
+# ============================================================
+# CREATE IMAGE
+# ============================================================
 
 image = Image.new(
     "RGB",
@@ -189,189 +306,305 @@ image = Image.new(
     theme["background"]
 )
 
-
 draw = ImageDraw.Draw(image)
 
 
-# ------------------------------------------------
+# ============================================================
 # FONTS
-# ------------------------------------------------
+# ============================================================
 
-try:
+def load_font(size, bold=False):
 
-    brand_font = ImageFont.truetype(
-        "DejaVuSans-Bold.ttf",
-        34
+    filename = (
+        "DejaVuSans-Bold.ttf"
+        if bold
+        else "DejaVuSans.ttf"
     )
 
-    topic_font = ImageFont.truetype(
-        "DejaVuSans-Bold.ttf",
-        28
+    try:
+        return ImageFont.truetype(
+            filename,
+            size
+        )
+
+    except OSError:
+        return ImageFont.load_default()
+
+
+brand_font = load_font(31, True)
+topic_font = load_font(27, True)
+headline_font = load_font(78, True)
+subtitle_font = load_font(31)
+feature_font = load_font(25, True)
+footer_font = load_font(24, True)
+icon_font = load_font(37, True)
+
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def rounded_box(
+    xy,
+    fill,
+    radius=20
+):
+
+    draw.rounded_rectangle(
+        xy,
+        radius=radius,
+        fill=fill
     )
 
-    headline_font = ImageFont.truetype(
-        "DejaVuSans-Bold.ttf",
-        82
-    )
 
-    subtitle_font = ImageFont.truetype(
-        "DejaVuSans.ttf",
-        34
-    )
+def fit_headline(
+    text,
+    max_width=820,
+    max_height=380
+):
 
-    small_bold_font = ImageFont.truetype(
-        "DejaVuSans-Bold.ttf",
-        27
-    )
+    for font_size in range(
+        82,
+        51,
+        -2
+    ):
 
-except OSError:
+        font = load_font(
+            font_size,
+            True
+        )
 
-    brand_font = ImageFont.load_default()
-    topic_font = ImageFont.load_default()
-    headline_font = ImageFont.load_default()
-    subtitle_font = ImageFont.load_default()
-    small_bold_font = ImageFont.load_default()
+        for wrap_width in range(
+            14,
+            24
+        ):
 
+            wrapped = textwrap.fill(
+                text,
+                width=wrap_width
+            )
 
-# ------------------------------------------------
-# DECORATIVE BACKGROUND
-# ------------------------------------------------
+            box = draw.multiline_textbbox(
+                (0, 0),
+                wrapped,
+                font=font,
+                spacing=15
+            )
 
-draw.ellipse(
-    (700, -180, 1150, 270),
-    fill=theme["light"]
-)
+            width = box[2] - box[0]
+            height = box[3] - box[1]
 
-draw.ellipse(
-    (-220, 1120, 250, 1590),
-    fill=theme["light"]
-)
+            if (
+                width <= max_width
+                and
+                height <= max_height
+            ):
 
+                return wrapped, font
 
-# Small decorative circles
-
-for x, y, size in [
-    (110, 240, 22),
-    (155, 240, 12),
-    (190, 240, 8)
-]:
-
-    draw.ellipse(
-        (
-            x - size,
-            y - size,
-            x + size,
-            y + size
+    return (
+        textwrap.fill(
+            text,
+            width=18
         ),
-        fill=theme["accent"]
+        load_font(52, True)
     )
 
 
-# ------------------------------------------------
-# TOP BRAND
-# ------------------------------------------------
+# ============================================================
+# BACKGROUND GRAPHICS
+# ============================================================
+
+draw.ellipse(
+    (
+        720,
+        -170,
+        1160,
+        270
+    ),
+    fill=theme["light"]
+)
+
+draw.ellipse(
+    (
+        -250,
+        1160,
+        260,
+        1670
+    ),
+    fill=theme["light"]
+)
+
+
+# Decorative lines
+
+draw.rounded_rectangle(
+    (
+        80,
+        180,
+        260,
+        191
+    ),
+    radius=5,
+    fill=theme["accent"]
+)
+
+
+# ============================================================
+# BRAND
+# ============================================================
 
 draw.text(
-    (80, 95),
+    (80, 100),
     "AI BUSINESS TOOLKIT",
     font=brand_font,
     fill=theme["dark"]
 )
 
 
-draw.rounded_rectangle(
-    (80, 155, 240, 165),
-    radius=5,
-    fill=theme["accent"]
+# ============================================================
+# AI VISUAL
+# ============================================================
+
+card_left = 690
+card_top = 75
+card_right = 910
+card_bottom = 295
+
+rounded_box(
+    (
+        card_left,
+        card_top,
+        card_right,
+        card_bottom
+    ),
+    theme["dark"],
+    42
 )
 
 
-# ------------------------------------------------
-# TOP VISUAL CARD
-# ------------------------------------------------
+centre_x = (
+    card_left + card_right
+) // 2
 
-draw.rounded_rectangle(
-    (650, 80, 900, 330),
-    radius=45,
-    fill=theme["dark"]
-)
+centre_y = (
+    card_top + card_bottom
+) // 2
 
-
-# AI-style simple graphic
 
 draw.ellipse(
-    (715, 140, 835, 260),
+    (
+        centre_x - 55,
+        centre_y - 55,
+        centre_x + 55,
+        centre_y + 55
+    ),
     outline="white",
-    width=8
-)
-
-
-draw.line(
-    (775, 110, 775, 140),
-    fill="white",
-    width=8
-)
-
-draw.line(
-    (775, 260, 775, 290),
-    fill="white",
-    width=8
-)
-
-draw.line(
-    (685, 200, 715, 200),
-    fill="white",
-    width=8
-)
-
-draw.line(
-    (835, 200, 865, 200),
-    fill="white",
-    width=8
+    width=7
 )
 
 
 draw.text(
-    (775, 200),
+    (
+        centre_x,
+        centre_y
+    ),
     "AI",
-    font=brand_font,
+    font=icon_font,
     fill="white",
     anchor="mm"
 )
 
 
-# ------------------------------------------------
-# TOPIC
-# ------------------------------------------------
+# Circuit lines
+
+draw.line(
+    (
+        centre_x,
+        centre_y - 85,
+        centre_x,
+        centre_y - 55
+    ),
+    fill="white",
+    width=7
+)
+
+draw.line(
+    (
+        centre_x,
+        centre_y + 55,
+        centre_x,
+        centre_y + 85
+    ),
+    fill="white",
+    width=7
+)
+
+draw.line(
+    (
+        centre_x - 85,
+        centre_y,
+        centre_x - 55,
+        centre_y
+    ),
+    fill="white",
+    width=7
+)
+
+draw.line(
+    (
+        centre_x + 55,
+        centre_y,
+        centre_x + 85,
+        centre_y
+    ),
+    fill="white",
+    width=7
+)
+
+
+# ============================================================
+# TOPIC LABEL
+# ============================================================
 
 topic = content["topic"].upper()
 
+topic_bbox = draw.textbbox(
+    (0, 0),
+    topic,
+    font=topic_font
+)
+
+topic_text_width = (
+    topic_bbox[2] -
+    topic_bbox[0]
+)
 
 topic_width = min(
     760,
     max(
-        300,
-        len(topic) * 22
+        260,
+        topic_text_width + 80
     )
 )
 
 
-draw.rounded_rectangle(
+rounded_box(
     (
         80,
-        380,
+        365,
         80 + topic_width,
-        460
+        440
     ),
-    radius=25,
-    fill=theme["light"]
+    theme["light"],
+    24
 )
 
 
 draw.text(
     (
         80 + topic_width / 2,
-        420
+        402
     ),
     topic,
     font=topic_font,
@@ -380,67 +613,97 @@ draw.text(
 )
 
 
-# ------------------------------------------------
+# ============================================================
 # HEADLINE
-# ------------------------------------------------
+# ============================================================
 
-headline = content["image_headline"]
+headline = content[
+    "image_headline"
+]
 
-
-wrapped_headline = textwrap.fill(
-    headline,
-    width=17
+wrapped_headline, final_headline_font = (
+    fit_headline(headline)
 )
 
 
 draw.multiline_text(
-    (80, 540),
+    (
+        80,
+        515
+    ),
     wrapped_headline,
-    font=headline_font,
+    font=final_headline_font,
     fill=theme["text"],
-    spacing=18
+    spacing=15
 )
 
 
-# ------------------------------------------------
+headline_bbox = draw.multiline_textbbox(
+    (
+        80,
+        515
+    ),
+    wrapped_headline,
+    font=final_headline_font,
+    spacing=15
+)
+
+headline_bottom = headline_bbox[3]
+
+
+# ============================================================
 # ACCENT LINE
-# ------------------------------------------------
+# ============================================================
+
+accent_y = min(
+    headline_bottom + 65,
+    910
+)
 
 draw.rounded_rectangle(
-    (80, 900, 520, 915),
-    radius=7,
+    (
+        80,
+        accent_y,
+        475,
+        accent_y + 13
+    ),
+    radius=6,
     fill=theme["accent"]
 )
 
 
-# ------------------------------------------------
+# ============================================================
 # SUBTITLE
-# ------------------------------------------------
+# ============================================================
 
-subtitle = content.get(
-    "image_subtitle",
-    "Practical AI tools for building your online business."
-)
-
+subtitle = content[
+    "image_subtitle"
+]
 
 wrapped_subtitle = textwrap.fill(
     subtitle,
-    width=38
+    width=42
 )
+
+
+subtitle_y = accent_y + 70
 
 
 draw.multiline_text(
-    (80, 970),
+    (
+        80,
+        subtitle_y
+    ),
     wrapped_subtitle,
     font=subtitle_font,
-    fill=(70, 75, 85),
-    spacing=12
+    fill=theme["secondary"],
+    spacing=11
 )
 
 
-# ------------------------------------------------
-# FEATURE BOXES
-# ------------------------------------------------
+# ============================================================
+# VALUE LABELS
+# ============================================================
 
 features = [
     "AI TOOLS",
@@ -448,90 +711,103 @@ features = [
     "ONLINE BUSINESS"
 ]
 
-
-box_y = 1170
+feature_y = 1160
 
 
 for feature in features:
 
-    text_box = draw.textbbox(
+    bbox = draw.textbbox(
         (0, 0),
         feature,
-        font=small_bold_font
+        font=feature_font
     )
 
     text_width = (
-        text_box[2] -
-        text_box[0]
+        bbox[2] -
+        bbox[0]
     )
 
-    box_width = text_width + 55
+    box_width = (
+        text_width + 60
+    )
 
-
-    draw.rounded_rectangle(
+    rounded_box(
         (
             80,
-            box_y,
+            feature_y,
             80 + box_width,
-            box_y + 65
+            feature_y + 62
         ),
-        radius=20,
-        fill=theme["light"]
+        theme["light"],
+        20
     )
-
 
     draw.text(
         (
             80 + box_width / 2,
-            box_y + 32
+            feature_y + 31
         ),
         feature,
-        font=small_bold_font,
+        font=feature_font,
         fill=theme["dark"],
         anchor="mm"
     )
 
+    feature_y += 78
 
-    box_y += 85
 
-
-# ------------------------------------------------
-# BOTTOM BRAND
-# ------------------------------------------------
-
-draw.text(
-    (920, 1415),
-    "AI Business Toolkit",
-    font=small_bold_font,
-    fill=theme["dark"],
-    anchor="ra"
-)
-
+# ============================================================
+# FOOTER BRAND
+# ============================================================
 
 draw.ellipse(
-    (80, 1385, 130, 1435),
+    (
+        80,
+        1380,
+        132,
+        1432
+    ),
     fill=theme["accent"]
 )
 
 
 draw.text(
-    (105, 1410),
+    (
+        106,
+        1406
+    ),
     "AI",
-    font=small_bold_font,
+    font=load_font(18, True),
     fill="white",
     anchor="mm"
 )
 
 
-# ------------------------------------------------
-# SAVE IMAGE
-# ------------------------------------------------
-
-image.save(
-    "pinterest_image.png",
-    quality=95
+draw.text(
+    (
+        920,
+        1407
+    ),
+    "AI Business Toolkit",
+    font=footer_font,
+    fill=theme["dark"],
+    anchor="ra"
 )
 
 
-print("Saved pinterest_image.png")
+# ============================================================
+# SAVE PINTEREST IMAGE
+# ============================================================
+
+image.save(
+    IMAGE_FILE,
+    format="PNG"
+)
+
+
+print(
+    f"Saved {IMAGE_FILE}"
+)
+
+print()
 print("Agent completed successfully.")
