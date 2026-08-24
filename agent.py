@@ -63,7 +63,7 @@ for attempt in range(3):
         break
     except urllib.error.HTTPError as e:
         if e.code in (429, 503) and attempt < 2:
-            time.sleep(15)
+            time.sleep(60)
         else:
             raise
 
