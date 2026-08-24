@@ -3,13 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="description" content="Free AI tools and business automation guides for entrepreneurs and small businesses.">
   <title>AI Business Toolkit</title>
-
-  <meta
-    name="description"
-    content="Practical AI tools, automation ideas and guides for building and growing an online business."
-  >
 
   <style>
     * {
@@ -18,168 +13,232 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #f6f7f9;
-      color: #17191c;
+      background: #f7f8fa;
+      color: #171717;
       line-height: 1.6;
     }
 
     header {
       background: #111827;
       color: white;
-      padding: 22px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .nav {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: auto;
+      padding: 18px 24px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
 
     .logo {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
     }
 
-    .nav span {
+    nav {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
       font-size: 14px;
-      opacity: 0.8;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
     }
 
     .hero {
-      max-width: 900px;
-      margin: auto;
+      padding: 90px 24px;
       text-align: center;
-      padding: 90px 20px 70px;
+      background: white;
     }
 
-    .badge {
-      display: inline-block;
-      background: #e8edf3;
-      border-radius: 30px;
-      padding: 7px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 22px;
+    .hero-inner {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      color: #4b5563;
     }
 
     h1 {
-      font-size: 52px;
-      line-height: 1.1;
+      font-size: clamp(38px, 6vw, 65px);
+      line-height: 1.05;
       margin-bottom: 22px;
     }
 
     .hero p {
       max-width: 650px;
-      margin: auto;
-      font-size: 19px;
-      color: #555d67;
+      margin: 0 auto 30px;
+      color: #4b5563;
+      font-size: 18px;
     }
 
     .button {
       display: inline-block;
-      margin-top: 30px;
-      padding: 14px 25px;
       background: #111827;
       color: white;
+      padding: 13px 22px;
+      border-radius: 7px;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
     }
 
-    .section {
-      max-width: 1100px;
+    .button:hover {
+      background: #374151;
+    }
+
+    section {
+      padding: 70px 24px;
+    }
+
+    .container {
+      max-width: 1150px;
       margin: auto;
-      padding: 40px 20px 80px;
     }
 
-    .section h2 {
+    .section-title {
+      margin-bottom: 35px;
+    }
+
+    .section-title h2 {
       font-size: 32px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .intro {
-      color: #626a74;
-      margin-bottom: 30px;
+    .section-title p {
+      color: #6b7280;
     }
 
-    .cards {
+    .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: 22px;
     }
 
     .card {
       background: white;
-      border: 1px solid #e2e5e9;
-      border-radius: 12px;
-      padding: 28px;
-    }
-
-    .card .number {
-      font-size: 13px;
-      font-weight: 700;
-      color: #6b7280;
-      margin-bottom: 14px;
+      padding: 26px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
     }
 
     .card h3 {
-      font-size: 21px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      font-size: 20px;
     }
 
     .card p {
-      color: #626a74;
-      font-size: 15px;
-    }
-
-    .topics {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px 20px 80px;
-    }
-
-    .topics h2 {
-      font-size: 32px;
-      margin-bottom: 25px;
-    }
-
-    .topic-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .topic {
-      background: #e8edf3;
-      padding: 9px 15px;
-      border-radius: 30px;
+      color: #6b7280;
+      margin-bottom: 18px;
       font-size: 14px;
-      font-weight: 600;
+    }
+
+    .tool-area {
+      margin-top: 18px;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      padding: 11px;
+      margin-bottom: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font: inherit;
+      background: white;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .result {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      min-height: 45px;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+
+    .guides {
+      background: #eef1f5;
+    }
+
+    .automation {
+      background: #111827;
+      color: white;
+    }
+
+    .automation .section-title p {
+      color: #d1d5db;
+    }
+
+    .automation .card {
+      color: #171717;
+    }
+
+    .privacy {
+      background: white;
     }
 
     footer {
-      background: #111827;
-      color: white;
+      background: #0b0f17;
+      color: #d1d5db;
       text-align: center;
       padding: 30px 20px;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    @media (max-width: 800px) {
-      h1 {
-        font-size: 38px;
+    @media (max-width: 850px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .cards {
+      .nav {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
         grid-template-columns: 1fr;
       }
 
+      nav {
+        justify-content: center;
+        gap: 14px;
+      }
+
       .hero {
-        padding-top: 60px;
+        padding: 65px 20px;
       }
     }
   </style>
@@ -190,124 +249,325 @@
 <header>
   <div class="nav">
     <div class="logo">AI Business Toolkit</div>
-    <span>AI • Automation • Online Business</span>
+
+    <nav>
+      <a href="#tools">AI Tools</a>
+      <a href="#guides">Guides</a>
+      <a href="#automation">Automation</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
   </div>
 </header>
 
 <main>
 
   <section class="hero">
-    <div class="badge">AI BUSINESS TOOLS</div>
+    <div class="hero-inner">
+      <div class="eyebrow">AI Business Tools</div>
 
-    <h1>Build Smarter With Free AI Tools</h1>
+      <h1>Build Smarter With Free AI Tools</h1>
 
-    <p>
-      Practical AI tools, workflows and automation ideas to help you
-      start, manage and grow an online business.
-    </p>
+      <p>
+        Practical tools, workflows and automation ideas to help you
+        create, manage and grow an online business.
+      </p>
 
-    <a class="button" href="#guides">Explore the Toolkit</a>
-  </section>
-
-  <section class="section" id="guides">
-
-    <h2>AI Business Guides</h2>
-
-    <p class="intro">
-      Simple ways to use AI for real business tasks.
-    </p>
-
-    <div class="cards">
-
-      <article class="card">
-        <div class="number">01</div>
-
-        <h3>Start a Business With Free AI Tools</h3>
-
-        <p>
-          Build your first AI business stack without paying for
-          expensive software.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="number">02</div>
-
-        <h3>Automate Social Media Content</h3>
-
-        <p>
-          Create a workflow for generating and organising social
-          media content with AI.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="number">03</div>
-
-        <h3>Draft Business SOPs With AI</h3>
-
-        <p>
-          Turn repeatable business processes into clear operating
-          procedures using AI.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="number">04</div>
-
-        <h3>AI for Customer Service</h3>
-
-        <p>
-          Use AI to draft responses, organise questions and reduce
-          repetitive customer support work.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="number">05</div>
-
-        <h3>AI Content Research</h3>
-
-        <p>
-          Develop ideas and organise research before creating your
-          business content.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="number">06</div>
-
-        <h3>Business Automation</h3>
-
-        <p>
-          Connect simple tools and workflows to reduce manual
-          business tasks.
-        </p>
-      </article>
-
+      <a class="button" href="#tools">Explore the Toolkit</a>
     </div>
   </section>
 
-  <section class="topics">
+  <section id="tools">
+    <div class="container">
 
-    <h2>Topics</h2>
+      <div class="section-title">
+        <h2>Free AI Business Tools</h2>
+        <p>Simple tools for common business and content tasks.</p>
+      </div>
 
-    <div class="topic-list">
-      <div class="topic">AI Tools</div>
-      <div class="topic">Automation</div>
-      <div class="topic">Online Business</div>
-      <div class="topic">Content Marketing</div>
-      <div class="topic">Productivity</div>
-      <div class="topic">AI Workflows</div>
+      <div class="grid">
+
+        <div class="card">
+          <h3>Business Idea Generator</h3>
+          <p>Turn your skills or interests into business concepts.</p>
+
+          <div class="tool-area">
+            <input id="ideaInput" placeholder="Example: accounting, fitness, design">
+            <button class="button" onclick="businessIdea()">Generate Ideas</button>
+            <div id="ideaResult" class="result">Your ideas will appear here.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Social Media Planner</h3>
+          <p>Create a basic weekly content plan.</p>
+
+          <div class="tool-area">
+            <input id="socialInput" placeholder="Your business or topic">
+            <button class="button" onclick="socialPlan()">Create Plan</button>
+            <div id="socialResult" class="result">Your content plan will appear here.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>SOP Builder</h3>
+          <p>Create a structured operating procedure for a business task.</p>
+
+          <div class="tool-area">
+            <input id="sopInput" placeholder="Example: Process customer refunds">
+            <button class="button" onclick="sopBuilder()">Build SOP</button>
+            <div id="sopResult" class="result">Your SOP will appear here.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Product Description Builder</h3>
+          <p>Create a structured description for a product or service.</p>
+
+          <div class="tool-area">
+            <input id="productInput" placeholder="Product or service">
+            <button class="button" onclick="productDescription()">Create Description</button>
+            <div id="productResult" class="result">Your description will appear here.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Business Name Generator</h3>
+          <p>Generate simple naming directions for a business.</p>
+
+          <div class="tool-area">
+            <input id="nameInput" placeholder="Business topic">
+            <button class="button" onclick="nameGenerator()">Generate Names</button>
+            <div id="nameResult" class="result">Your names will appear here.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Prompt Builder</h3>
+          <p>Turn a business task into a reusable AI prompt.</p>
+
+          <div class="tool-area">
+            <textarea id="promptInput" placeholder="Describe what you want AI to do"></textarea>
+            <button class="button" onclick="promptBuilder()">Build Prompt</button>
+            <div id="promptResult" class="result">Your prompt will appear here.</div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </section>
 
+  <section id="guides" class="guides">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>AI Business Guides</h2>
+        <p>Practical workflows for using AI in business.</p>
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+          <h3>Draft Business SOPs</h3>
+          <p>Structure repeatable business processes with AI.</p>
+        </div>
+
+        <div class="card">
+          <h3>Automate Social Content</h3>
+          <p>Build a repeatable content creation workflow.</p>
+        </div>
+
+        <div class="card">
+          <h3>Research Business Ideas</h3>
+          <p>Use AI to organise market and customer research.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="automation" class="automation">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Business Automation</h2>
+        <p>Build repeatable workflows that reduce manual work.</p>
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+          <h3>Content Workflow</h3>
+          <p>Idea → draft → review → publish.</p>
+        </div>
+
+        <div class="card">
+          <h3>Pinterest Workflow</h3>
+          <p>Create content and prepare Pins for publishing.</p>
+        </div>
+
+        <div class="card">
+          <h3>AI Assistant</h3>
+          <p>Use AI to support recurring business tasks.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy" class="privacy">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Privacy Policy</h2>
+      </div>
+
+      <p>
+        AI Business Toolkit provides business tools and educational
+        resources. This website does not intentionally sell personal
+        information.
+      </p>
+
+      <br>
+
+      <p>
+        If third-party services or APIs are connected, information required
+        to provide those services may be processed according to the privacy
+        policies of those providers.
+      </p>
+
+      <br>
+
+      <p>
+        Users should not submit confidential, financial, authentication or
+        other sensitive information through public forms on this website.
+      </p>
+
+    </div>
   </section>
 
 </main>
 
 <footer>
-  AI Business Toolkit
+  © 2026 AI Business Toolkit. All rights reserved.
 </footer>
+
+<script>
+  function getValue(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  function businessIdea() {
+    const topic = getValue("ideaInput");
+
+    if (!topic) {
+      document.getElementById("ideaResult").textContent =
+        "Enter a skill, industry or interest first.";
+      return;
+    }
+
+    document.getElementById("ideaResult").textContent =
+      "1. " + topic + " consulting service\n" +
+      "2. Online " + topic + " training business\n" +
+      "3. Digital products for the " + topic + " market\n" +
+      "4. Subscription resource focused on " + topic + "\n" +
+      "5. Specialist " + topic + " content business";
+  }
+
+  function socialPlan() {
+    const topic = getValue("socialInput");
+
+    if (!topic) {
+      document.getElementById("socialResult").textContent =
+        "Enter your business or topic first.";
+      return;
+    }
+
+    document.getElementById("socialResult").textContent =
+      "Monday — Educational post about " + topic + "\n" +
+      "Tuesday — Common customer problem\n" +
+      "Wednesday — Practical tip\n" +
+      "Thursday — Example or case study\n" +
+      "Friday — Frequently asked question\n" +
+      "Saturday — Short checklist\n" +
+      "Sunday — Weekly summary";
+  }
+
+  function sopBuilder() {
+    const task = getValue("sopInput");
+
+    if (!task) {
+      document.getElementById("sopResult").textContent =
+        "Enter the process you want to document.";
+      return;
+    }
+
+    document.getElementById("sopResult").textContent =
+      "SOP: " + task + "\n\n" +
+      "Purpose\nDefine the expected outcome.\n\n" +
+      "Owner\nAssign responsibility.\n\n" +
+      "Steps\n1. Receive the request.\n2. Check required information.\n3. Complete the task.\n4. Review the result.\n5. Record completion.\n\n" +
+      "Quality Check\nConfirm the required outcome was achieved.";
+  }
+
+  function productDescription() {
+    const product = getValue("productInput");
+
+    if (!product) {
+      document.getElementById("productResult").textContent =
+        "Enter a product or service first.";
+      return;
+    }
+
+    document.getElementById("productResult").textContent =
+      product + "\n\n" +
+      "A practical solution designed for customers who need " +
+      product.toLowerCase() + ".\n\n" +
+      "Key points\n" +
+      "• Clear purpose\n" +
+      "• Simple customer benefit\n" +
+      "• Easy-to-understand offer\n" +
+      "• Suitable for online promotion";
+  }
+
+  function nameGenerator() {
+    const topic = getValue("nameInput");
+
+    if (!topic) {
+      document.getElementById("nameResult").textContent =
+        "Enter your business topic first.";
+      return;
+    }
+
+    const clean = topic.replace(/\s+/g, "");
+
+    document.getElementById("nameResult").textContent =
+      clean + "Lab\n" +
+      clean + "Works\n" +
+      clean + "Hub\n" +
+      clean + "Studio\n" +
+      clean + "Flow";
+  }
+
+  function promptBuilder() {
+    const task = getValue("promptInput");
+
+    if (!task) {
+      document.getElementById("promptResult").textContent =
+        "Describe the task first.";
+      return;
+    }
+
+    document.getElementById("promptResult").textContent =
+      "Act as an experienced business assistant.\n\n" +
+      "Task\n" + task + "\n\n" +
+      "Requirements\n" +
+      "Use clear language.\n" +
+      "Give practical steps.\n" +
+      "Avoid unsupported claims.\n" +
+      "Ask for missing information when necessary.\n" +
+      "Return the result in a format that can be used immediately.";
+  }
+</script>
 
 </body>
 </html>
