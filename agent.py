@@ -62,10 +62,13 @@ for attempt in range(3):
             result = json.loads(response.read().decode("utf-8"))
         break
     except urllib.error.HTTPError as e:
-        if e.code in (429, 503) and attempt < 2:
-            time.sleep(60)
-        else:
+        if e.code not in (429, 503) or attempt == 2:
             raise
+        time.sleep(60)
+    except TimeoutError:
+        if attempt == 2:
+            raise
+        time.sleep(60)
 
 text = result["candidates"][0]["content"]["parts"][0]["text"]
 content = json.loads(text)
