@@ -83,3 +83,7 @@ print("Title:", content["title"])
 print("Description:", content["description"])
 print("Image headline:", content["image_headline"])
 print("Topic:", content["topic"])
+with open("generated_content.json", "w", encoding="utf-8") as f:
+    json.dump(content, f, ensure_ascii=False, indent=2)
+
+print("Saved generated_content.json")
