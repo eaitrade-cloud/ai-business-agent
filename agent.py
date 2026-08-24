@@ -1,10 +1,15 @@
 import os
 import json
+import time
 import urllib.request
 import urllib.error
-import time
+import textwrap
+
+from PIL import Image, ImageDraw, ImageFont
+
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+
 
 prompt = """
 You are the content agent for AI Business Toolkit.
@@ -31,10 +36,12 @@ Do not use clickbait.
 Do not claim personal experience.
 """
 
+
 url = (
     "https://generativelanguage.googleapis.com/v1beta/"
     "models/gemini-3.5-flash:generateContent"
 )
+
 
 payload = {
     "contents": [
@@ -49,6 +56,7 @@ payload = {
     }
 }
 
+
 request = urllib.request.Request(
     url,
     data=json.dumps(payload).encode("utf-8"),
@@ -58,6 +66,7 @@ request = urllib.request.Request(
     },
     method="POST"
 )
+
 
 for attempt in range(3):
     try:
@@ -74,8 +83,10 @@ for attempt in range(3):
         else:
             raise
 
+
 text = result["candidates"][0]["content"]["parts"][0]["text"]
 content = json.loads(text)
+
 
 print("AI BUSINESS TOOLKIT - TEST CONTENT")
 print("----------------------------------")
@@ -83,7 +94,41 @@ print("Title:", content["title"])
 print("Description:", content["description"])
 print("Image headline:", content["image_headline"])
 print("Topic:", content["topic"])
+
+
+# Save generated content
 with open("generated_content.json", "w", encoding="utf-8") as f:
     json.dump(content, f, ensure_ascii=False, indent=2)
 
 print("Saved generated_content.json")
+
+
+# Create Pinterest image
+width = 1000
+height = 1500
+
+image = Image.new("RGB", (width, height), "white")
+draw = ImageDraw.Draw(image)
+
+headline = content["image_headline"]
+
+try:
+    font = ImageFont.truetype("DejaVuSans-Bold.ttf", 80)
+except OSError:
+    font = ImageFont.load_default()
+
+wrapped_text = textwrap.fill(headline, width=20)
+
+draw.multiline_text(
+    (width // 2, height // 2),
+    wrapped_text,
+    font=font,
+    fill="black",
+    anchor="mm",
+    align="center",
+    spacing=20
+)
+
+image.save("pinterest_image.png")
+
+print("Saved pinterest_image.png")
