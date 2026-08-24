@@ -58,7 +58,7 @@ request = urllib.request.Request(
 
 for attempt in range(3):
     try:
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with urllib.request.urlopen(request, timeout=180) as response:
             result = json.loads(response.read().decode("utf-8"))
         break
     except urllib.error.HTTPError as e:
