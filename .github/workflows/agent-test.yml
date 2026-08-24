@@ -28,4 +28,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-content
-          path: generated_content.json
+          path: |
+            generated_content.json
+            pinterest_image.png
